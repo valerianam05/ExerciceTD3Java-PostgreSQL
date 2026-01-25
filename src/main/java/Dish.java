@@ -1,86 +1,47 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Dish {
-    private Integer id;
+    private int id;
     private String name;
     private Double price;
-    private DishTypeEnum dishType;
-    private List<Ingredient> ingredients;
+    // La liste s'appelle 'recipe' (recette)
+    private List<DishIngredient> recipe = new ArrayList<>();
 
-    // Constructeur par défaut
-    public Dish() {}
+    // --- LE SETTER (pour corriger l'erreur ligne 21) ---
+    public void setRecipe(List<DishIngredient> recipe) {
+        this.recipe = recipe;
+    }
 
-    public Double getDishCost() {
-        double total = 0.0;
-        if (ingredients != null) {
-            for (Ingredient ing : ingredients) {
-                // Important : ing.getQuantity() vient de la table de jointure
-                if (ing.getPrice() != null && ing.getQuantity() != null) {
-                    total += ing.getPrice() * ing.getQuantity();
-                }
-            }
+    // --- LE GETTER (pour corriger l'erreur ligne 77) ---
+    public List<DishIngredient> getRecipe() {
+        return recipe;
+    }
+
+    // Méthode utilitaire pour ajouter un ingrédient un par un
+    public void addIngredientToRecipe(DishIngredient di) {
+        this.recipe.add(di);
+    }
+
+    // Calcul du coût total
+    public double getDishCost() {
+        double total = 0;
+        for (DishIngredient line : recipe) {
+            total += line.getLineCost();
         }
         return total;
     }
 
-    public Double getGrossMargin() {
-        if (this.price == null) {
-            // Déclenché pour la Salade de fruits ou le Riz aux légumes
-            throw new RuntimeException("Calcul de marge impossible : le prix de vente est manquant pour le plat : " + this.name);
-        }
+    public double getGrossMargin() {
+        if (this.price == null) throw new RuntimeException("Prix de vente non défini");
         return this.price - getDishCost();
     }
 
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    // La méthode qui manquait et causait l'erreur dans DataRetriever
-    public DishTypeEnum getDishType() {
-        return dishType;
-    }
-
-    public void setDishType(DishTypeEnum dishType) {
-        this.dishType = dishType;
-    }
-
-    public List<Ingredient> getIngredients() {
-        return ingredients;
-    }
-
-    public void setIngredients(List<Ingredient> ingredients) {
-        this.ingredients = ingredients;
-    }
-
-    @Override
-    public String toString() {
-        return "Dish{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", type=" + dishType +
-                ", ingredientsCount=" + (ingredients != null ? ingredients.size() : 0) +
-                '}';
-    }
+    // Getters et Setters pour id, name, price
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { this.price = price; }
 }
