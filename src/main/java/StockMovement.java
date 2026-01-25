@@ -20,4 +20,6 @@ public class StockMovement {
     public int getId() {
         return id;
     }
+
+
 }

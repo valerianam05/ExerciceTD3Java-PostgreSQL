@@ -63,17 +63,64 @@ public class Main {
 //    System.out.println("Toutes les données de l'image ont été traitées.");
 //}
 
+
+//    public static void main(String[] args) {
+//        DataRetriever dr = new DataRetriever();
+//        Ingredient fromage = new Ingredient(5, "Fromage", 5000.0);
+//        fromage.setCategory(CategoryEnum.ANIMAL);
+//
+//        // 2. On appelle la méthode de sauvegarde
+//        dr.saveIngredient(fromage);
+//
+//        System.out.println("Test de sauvegarde terminé !");
+//    }
+
+
+//    public static void main(String[] args) {
+//        DataRetriever dr = new DataRetriever();
+//        List<Ingredient> ingredients = dr.findAllIngredients();
+//        System.out.println(ingredients);
+//    }
+//
+
+
     public static void main(String[] args) {
         DataRetriever dr = new DataRetriever();
 
-        // 1. On crée un objet Ingredient en Java (ex: le fameux n°5)
-        // Imaginons que le Fromage coûte 5000 et soit de catégorie ANIMAL
-        Ingredient fromage = new Ingredient(5, "Fromage", 5000.0);
-        fromage.setCategory(CategoryEnum.ANIMAL);
+        List<Ingredient> ingredients = dr.findAllIngredients();
 
-        // 2. On appelle la méthode de sauvegarde
-        dr.saveIngredient(fromage);
+        if (ingredients.isEmpty()) {
+            System.out.println("La base est vide. Vérifie tes données SQL !");
+        } else {
+            for (Ingredient ing : ingredients) {
+                System.out.println("\nIngrédient : " + ing.getName().toUpperCase());
+                System.out.println("Prix Unit. : " + ing.getPrice() + " Ar");
 
-        System.out.println("Test de sauvegarde terminé !");
+                // 2. Calcul du stock en parcourant la liste des mouvements
+                double stockActuel = 0;
+                List<StockMovement> mouvements = ing.getStockMovementList();
+
+                if (mouvements != null && !mouvements.isEmpty()) {
+                    System.out.println("Historique des mouvements :");
+                    for (StockMovement sm : mouvements) {
+                        double qte = sm.getValue().getQuantity();
+                        String unite = sm.getValue().getUnit().toString();
+
+                        if (sm.getType() == MovementType.IN) {
+                            stockActuel += qte;
+                            System.out.println("   Entrée de " + qte + " " + unite);
+                        } else {
+                            stockActuel -= qte;
+                            System.out.println("   Sortie de " + qte + " " + unite);
+                        }
+                    }
+                } else {
+                    System.out.println("  (!) Aucun mouvement enregistré pour cet ingrédient.");
+                }
+
+                System.out.println("STOCK FINAL : " + stockActuel);
+                System.out.println("VALEUR DU STOCK : " + (stockActuel * ing.getPrice()) + " Ar");
+            }
+        }
     }
 }

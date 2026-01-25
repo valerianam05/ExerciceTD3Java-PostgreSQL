@@ -5,25 +5,20 @@ public class Dish {
     private int id;
     private String name;
     private Double price;
-    // La liste s'appelle 'recipe' (recette)
     private List<DishIngredient> recipe = new ArrayList<>();
 
-    // --- LE SETTER (pour corriger l'erreur ligne 21) ---
     public void setRecipe(List<DishIngredient> recipe) {
         this.recipe = recipe;
     }
 
-    // --- LE GETTER (pour corriger l'erreur ligne 77) ---
     public List<DishIngredient> getRecipe() {
         return recipe;
     }
 
-    // Méthode utilitaire pour ajouter un ingrédient un par un
     public void addIngredientToRecipe(DishIngredient di) {
         this.recipe.add(di);
     }
 
-    // Calcul du coût total
     public double getDishCost() {
         double total = 0;
         for (DishIngredient line : recipe) {

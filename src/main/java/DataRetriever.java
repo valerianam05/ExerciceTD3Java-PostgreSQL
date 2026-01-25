@@ -1,6 +1,7 @@
 import db.DBConnection;
 
 import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,9 @@ public class DataRetriever {
     }
 
     public Dish findDishById(Integer id) {
-        String sql = "SELECT * FROM dish WHERE id = ?";
+        // On remplace "SELECT *" par les colonnes explicites
+        String sql = "SELECT id, name, selling_price FROM dish WHERE id = ?";
+
         try (Connection conn = new DBConnection().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -40,13 +43,16 @@ public class DataRetriever {
                 Dish dish = new Dish();
                 dish.setId(rs.getInt("id"));
                 dish.setName(rs.getString("name"));
+                // Utilisation de getObject pour gérer le cas où le prix est NULL en base
                 dish.setPrice(rs.getObject("selling_price") != null ? rs.getDouble("selling_price") : null);
 
-                // Charge la recette complète via la jointure
+                // Charge la recette complète
                 dish.setRecipe(this.findRecipeByDish(id));
                 return dish;
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -71,7 +77,9 @@ public class DataRetriever {
 
                 recipe.add(new DishIngredient(ing, qty, unit));
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return recipe;
     }
 
@@ -110,7 +118,9 @@ public class DataRetriever {
                 conn.rollback();
                 throw e;
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void saveStockMovement(StockMovement movement, int idIngredient) {
@@ -153,7 +163,14 @@ public class DataRetriever {
             ps.setString(4, toSave.getCategory().toString());
 
             ps.executeUpdate();
-            System.out.println("Ingrédient sauvegardé avec succès dans la table varchar !");
+            if (toSave.getStockMovementList() != null) {
+                for (StockMovement movement : toSave.getStockMovementList()) {
+                    // On utilise la méthode que tu as déjà écrite pour les mouvements
+                    this.saveStockMovement(movement, toSave.getId());
+                }
+            }
+
+            System.out.println("Ingrédient et ses mouvements sauvegardés !");
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -161,5 +178,73 @@ public class DataRetriever {
         return toSave;
     }
 
+    public List<Ingredient> findAllIngredients() {
+        List<Ingredient> ingredients = new ArrayList<>();
+
+        // On liste chaque colonne séparément
+        String sql = "SELECT id, name, price, category FROM ingredient";
+
+        try (Connection conn = new DBConnection().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Ingredient ing = new Ingredient();
+                // On récupère les données par le nom des colonnes listées plus haut
+                ing.setId(rs.getInt("id"));
+                ing.setName(rs.getString("name"));
+                ing.setPrice(rs.getDouble("price"));
+
+                String catStr = rs.getString("category");
+                if (catStr != null) {
+                    ing.setCategory(CategoryEnum.valueOf(catStr));
+                }
+
+                // On n'oublie pas de charger les mouvements (Question 2.c)
+                ing.setStockMovementList(this.getStockMovements(ing.getId()));
+
+                ingredients.add(ing);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ingredients;
+    }
+
+    public List<StockMovement> getStockMovements(int idIngredient) {
+        List<StockMovement> movements = new ArrayList<>();
+        // Au lieu de "SELECT * FROM stock_movement..."
+        String sql = "SELECT id, quantity, unit, type, creation_datetime FROM stock_movement WHERE id_ingredient = ?";
+
+        try (Connection conn = new DBConnection().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idIngredient);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                double quantity = rs.getDouble("quantity");
+
+                // On récupère le String de la base de données
+                String unitStr = rs.getString("unit");
+
+                // CONVERSION : On transforme le String en objet Unit
+                Unit unitEnum = Unit.valueOf(unitStr);
+
+                MovementType type = MovementType.valueOf(rs.getString("type"));
+                Instant date = rs.getTimestamp("creation_datetime").toInstant();
+
+                // Maintenant, les types correspondent ! (double, Unit)
+                StockValue stockValue = new StockValue(quantity, unitEnum);
+
+                StockMovement sm = new StockMovement(id, stockValue, type, date);
+                movements.add(sm);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return movements;
+    }
 
 }

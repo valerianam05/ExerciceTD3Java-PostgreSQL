@@ -61,7 +61,10 @@ public class Ingredient {
     // 5. MÉTHODES UTILES (Affichage et Comparaison)
     @Override
     public String toString() {
-        return "Ingredient{" + "id=" + id + ", name='" + name + '\'' + ", price=" + price + '}';
+        return "Ingredient{" + "id=" + id +
+                ", name='" + name + '\''
+                + ", price=" + price +
+                "category" + category +  '}';
     }
 
     @Override
