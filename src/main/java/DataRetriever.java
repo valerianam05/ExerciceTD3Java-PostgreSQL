@@ -247,4 +247,16 @@ public class DataRetriever {
         return movements;
     }
 
+    public void showStockStatus() {
+        List<Ingredient> ingredients = this.findAllIngredients();
+
+        for (Ingredient ingredient : ingredients) {
+            double remaining = ingredient.getCurrentStock();
+
+            // La sortie console reste en français pour la lisibilité
+            System.out.println("Ingrédient : " + ingredient.getName() +
+                    " | Stock : " + remaining);
+        }
+    }
+
 }

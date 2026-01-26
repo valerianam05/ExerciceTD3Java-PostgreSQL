@@ -84,43 +84,55 @@ public class Main {
 //
 
 
-    public static void main(String[] args) {
-        DataRetriever dr = new DataRetriever();
+//    public static void main(String[] args) {
+//        DataRetriever dr = new DataRetriever();
+//
+//        List<Ingredient> ingredients = dr.findAllIngredients();
+//
+//        if (ingredients.isEmpty()) {
+//            System.out.println("La base est vide. Vérifie tes données SQL !");
+//        } else {
+//            for (Ingredient ing : ingredients) {
+//                System.out.println("\nIngrédient : " + ing.getName().toUpperCase());
+//                System.out.println("Prix Unit. : " + ing.getPrice() + " Ar");
+//
+//                // 2. Calcul du stock en parcourant la liste des mouvements
+//                double stockActuel = 0;
+//                List<StockMovement> mouvements = ing.getStockMovementList();
+//
+//                if (mouvements != null && !mouvements.isEmpty()) {
+//                    System.out.println("Historique des mouvements :");
+//                    for (StockMovement sm : mouvements) {
+//                        double qte = sm.getValue().getQuantity();
+//                        String unite = sm.getValue().getUnit().toString();
+//
+//                        if (sm.getType() == MovementType.IN) {
+//                            stockActuel += qte;
+//                            System.out.println("   Entrée de " + qte + " " + unite);
+//                        } else {
+//                            stockActuel -= qte;
+//                            System.out.println("   Sortie de " + qte + " " + unite);
+//                        }
+//                    }
+//                } else {
+//                    System.out.println("  (!) Aucun mouvement enregistré pour cet ingrédient.");
+//                }
+//
+//                System.out.println("STOCK FINAL : " + stockActuel);
+//                System.out.println("VALEUR DU STOCK : " + (stockActuel * ing.getPrice()) + " Ar");
+//            }
+//        }
+//    }
+//public static void main(String[] args) {
+//    DataRetriever dataRetriever = new DataRetriever();
+//
+//    dataRetriever.showStockStatus();
+//}
 
-        List<Ingredient> ingredients = dr.findAllIngredients();
+        public static void main(String[] args) {
 
-        if (ingredients.isEmpty()) {
-            System.out.println("La base est vide. Vérifie tes données SQL !");
-        } else {
-            for (Ingredient ing : ingredients) {
-                System.out.println("\nIngrédient : " + ing.getName().toUpperCase());
-                System.out.println("Prix Unit. : " + ing.getPrice() + " Ar");
-
-                // 2. Calcul du stock en parcourant la liste des mouvements
-                double stockActuel = 0;
-                List<StockMovement> mouvements = ing.getStockMovementList();
-
-                if (mouvements != null && !mouvements.isEmpty()) {
-                    System.out.println("Historique des mouvements :");
-                    for (StockMovement sm : mouvements) {
-                        double qte = sm.getValue().getQuantity();
-                        String unite = sm.getValue().getUnit().toString();
-
-                        if (sm.getType() == MovementType.IN) {
-                            stockActuel += qte;
-                            System.out.println("   Entrée de " + qte + " " + unite);
-                        } else {
-                            stockActuel -= qte;
-                            System.out.println("   Sortie de " + qte + " " + unite);
-                        }
-                    }
-                } else {
-                    System.out.println("  (!) Aucun mouvement enregistré pour cet ingrédient.");
-                }
-
-                System.out.println("STOCK FINAL : " + stockActuel);
-                System.out.println("VALEUR DU STOCK : " + (stockActuel * ing.getPrice()) + " Ar");
-            }
+                DataRetriever dr = new DataRetriever();
+                // On se contente d'afficher l'état actuel calculé depuis la DB
+                dr.showStockStatus();
         }
-    }
 }

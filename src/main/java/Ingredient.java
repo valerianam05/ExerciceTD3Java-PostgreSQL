@@ -11,7 +11,6 @@ public class Ingredient {
 
     private List<StockMovement> stockMovementList = new ArrayList<>();
 
-    // 2. CONSTRUCTEURS (Pour créer l'objet facilement)
     public Ingredient() {
     }
 
@@ -41,7 +40,23 @@ public class Ingredient {
         // On renvoie le résultat final sous forme de StockValue
         return new StockValue(totalQuantity, Unit.KG);
     }
-    // 4. GETTERS ET SETTERS (Pour que le DataRetriever puisse remplir l'objet)
+
+    public double getCurrentStock() {
+        double total = 0.0;
+        if (this.stockMovementList != null) {
+            for (StockMovement movement : this.stockMovementList) {
+                // Addition if IN, Subtraction if OUT
+                if (movement.getType() == MovementType.IN) {
+                    total += movement.getValue().getQuantity();
+                } else {
+                    total -= movement.getValue().getQuantity();
+                }
+            }
+        }
+        return total;
+    }
+
+
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
