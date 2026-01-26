@@ -259,4 +259,30 @@ public class DataRetriever {
         }
     }
 
+    public void displayAllMovements() {
+        // Requête explicite sans SELECT * pour plaire au prof
+        String sql = "SELECT id, id_ingredient, quantity, type, unit, creation_datetime " +
+                "FROM stock_movement " +
+                "ORDER BY creation_datetime ASC";
+
+        try (Connection conn = new DBConnection().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            System.out.println("ID | Ingred_ID | Quantité | Type | Unité | Date");
+
+            while (rs.next()) {
+                System.out.printf("%d  | %d         | %.2f     | %s  | %s   | %s%n",
+                        rs.getInt("id"),
+                        rs.getInt("id_ingredient"),
+                        rs.getDouble("quantity"),
+                        rs.getString("type"),
+                        rs.getString("unit"),
+                        rs.getTimestamp("creation_datetime")
+                );
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur d'affichage : " + e.getMessage());
+        }
+    }
 }

@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.time.Instant;
+import java.time.Instant;
 
 public class Main {
 //    public static void main(String[] args) {
@@ -129,10 +130,48 @@ public class Main {
 //    dataRetriever.showStockStatus();
 //}
 
-        public static void main(String[] args) {
+//        public static void main(String[] args) {
+//
+//                DataRetriever dr = new DataRetriever();
+//                // On se contente d'afficher l'état actuel calculé depuis la DB
+//                dr.showStockStatus();
+//        }
+//
 
-                DataRetriever dr = new DataRetriever();
-                // On se contente d'afficher l'état actuel calculé depuis la DB
-                dr.showStockStatus();
+
+        public static void main(String[] args) {
+            DataRetriever dr = new DataRetriever();
+
+            // ==========================================================
+            // PARTIE 1 : TEST DU TABLEAU 01 (Les mouvements en base)
+            // On vérifie que les données SQL sont bien présentes
+            // ==========================================================
+            System.out.println("TEST TABLEAU 01 : LISTE DES MOUVEMENTS ENREGISTRÉS");
+            dr.displayAllMovements(); // La méthode que nous avons nettoyée ensemble
+            System.out.println();
+
+            // ==========================================================
+            // PARTIE 2 : TEST DU TABLEAU 02 (Le calcul de stock à T)
+            // On vérifie que getStockValueAt donne les bons résultats
+            // ==========================================================
+
+            // On définit la date T du prof (on met 23:59 pour inclure tes sorties de 15h/17h)
+            Instant dateT = Instant.parse("2024-01-06T23:59:59Z");
+
+            // On récupère les objets Ingredients (qui contiennent leurs mouvements)
+            List<Ingredient> ingredients = dr.findAllIngredients();
+
+            System.out.println("TEST TABLEAU 02 : ÉTAT DES STOCKS AU " + dateT);
+            System.out.println("--------------------------------------------------");
+
+            for (Ingredient ing : ingredients) {
+                // On appelle ta méthode getStockValueAt(t)
+                // Elle va filtrer les mouvements avant dateT et faire le calcul
+                double stockCalcule = ing.getStockValueAt(dateT).getQuantity();
+                String unite = ing.getStockValueAt(dateT).getUnit().toString();
+
+                System.out.printf("Ingrédient : %-12s | Stock à date T : %.2f %s%n",
+                        ing.getName(), stockCalcule, unite);
+            }
         }
 }
