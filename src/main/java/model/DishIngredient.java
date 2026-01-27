@@ -1,3 +1,5 @@
+package model;
+
 public class DishIngredient {
     private Ingredient ingredient;
     private double quantity;

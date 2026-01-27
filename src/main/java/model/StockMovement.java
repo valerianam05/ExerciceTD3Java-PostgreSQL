@@ -1,7 +1,9 @@
+package model;
+
 import java.time.Instant;
 public class StockMovement {
     private int id;
-    private StockValue value; // Utilise la classe StockValue ci-dessus
+    private StockValue value; // Utilise la classe model.StockValue ci-dessus
     private MovementType type; // Utilise l'Enum IN/OUT
     private Instant creationDatetime; // La date précise
 
