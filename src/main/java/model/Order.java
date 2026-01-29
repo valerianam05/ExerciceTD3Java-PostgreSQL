@@ -10,7 +10,7 @@ public class Order {
     private Instant creationDatetime;
     private String type;
     private String status;
-
+    private Type_Order orderType;
     private List<DishOrder> dishOrderList = new ArrayList<>();
 
     public Order() {
@@ -19,7 +19,17 @@ public class Order {
         this.status = "CREATED";
     }
 
+    public static Object setTypeOrder(Type_Order typeOrder) {
+        return typeOrder;
+    }
 
+    public Type_Order getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(Type_Order orderType) {
+        this.orderType = orderType;
+    }
 
     public double getTotalAmountWithoutVAT() {
         double total = 0;

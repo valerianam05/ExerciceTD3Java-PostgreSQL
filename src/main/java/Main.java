@@ -2,6 +2,8 @@ import dao.DataRetriever;
 import model.*;
 import java.time.Instant;
 
+import static model.Type_Order.TAKE_AWAY;
+
 
 public class Main {
 
@@ -84,44 +86,44 @@ public class Main {
 //            } catch (RuntimeException e) {
 //                System.out.println(" Test réussi ! Le système a bien bloqué la commande : " + e.getMessage());
 //            }
-        public static void main(String[] args) {
-            DataRetriever dao = new DataRetriever();
-            String maRef = "TEST-" + System.currentTimeMillis();
+//            try {
+//                Order nouvelleCommande = new Order();
+//                nouvelleCommande.setReference(maRef);
+//                nouvelleCommande.setCreationDatetime(Instant.now());
+//                nouvelleCommande.setType("EAT_IN");
+//                nouvelleCommande.setStatus("CREATED");
+//
+//                System.out.println("\n1. Enregistrement initial...");
+//                dao.saveOrder(nouvelleCommande);
+//
+//                System.out.println("\n2. Passage de la commande en READY et TAKE_AWAY...");
+//                nouvelleCommande.setStatus("READY");
+//                nouvelleCommande.setType("TAKE_AWAY");
+//                dao.saveOrder(nouvelleCommande);
+//
+//                nouvelleCommande.setStatus("DELIVERED");
+//                dao.saveOrder(nouvelleCommande);
+//
+//                System.out.println("\n4. Tentative de modification d'une commande LIVRÉE (Interdit)...");
+//                nouvelleCommande.setType("EAT_IN");
+//
+//                dao.saveOrder(nouvelleCommande);
+//
+//            } catch (RuntimeException e) {
+//                System.out.println(" RÉSULTAT ATTENDU : Blocage réussi !");
+//                System.out.println("Message d'erreur : " + e.getMessage());
+//            } catch (Exception e) {
+//                System.err.println(" Erreur inattendue : " + e.getMessage());
+//                e.printStackTrace();
+//            }
 
-            try {
-                Order nouvelleCommande = new Order();
-                nouvelleCommande.setReference(maRef);
-                nouvelleCommande.setCreationDatetime(Instant.now());
-                nouvelleCommande.setType("EAT_IN");
-                nouvelleCommande.setStatus("CREATED");
-
-                System.out.println("\n1. Enregistrement initial...");
-                dao.saveOrder(nouvelleCommande);
-
-                System.out.println("\n2. Passage de la commande en READY et TAKE_AWAY...");
-                nouvelleCommande.setStatus("READY");
-                nouvelleCommande.setType("TAKE_AWAY");
-                dao.saveOrder(nouvelleCommande);
-
-                System.out.println("\n3. Passage de la commande en DELIVERED...");
-                nouvelleCommande.setStatus("DELIVERED");
-                dao.saveOrder(nouvelleCommande);
-
-                System.out.println("\n4. Tentative de modification d'une commande LIVRÉE (Interdit)...");
-                nouvelleCommande.setType("EAT_IN");
-
-                dao.saveOrder(nouvelleCommande);
-
-            } catch (RuntimeException e) {
-                System.out.println(" RÉSULTAT ATTENDU : Blocage réussi !");
-                System.out.println("Message d'erreur : " + e.getMessage());
-            } catch (Exception e) {
-                System.err.println(" Erreur inattendue : " + e.getMessage());
-                e.printStackTrace();
-            }
+    public static void main(String[] args) {
+        DataRetriever data = new DataRetriever();
+        Order order = data.findOrderByReference("ORD100");
+        order.setReference(order.getType());
+        data.saveOrder(order);
 
         }
-
 
     }
 
