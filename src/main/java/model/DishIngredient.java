@@ -1,22 +1,34 @@
 package model;
 
 public class DishIngredient {
-    private Ingredient ingredient;
-    private double quantity;
-    private Unit unit;
-    //id dish
-    public DishIngredient(Ingredient ingredient, double quantity, Unit unit) {
+    private Integer id;
+    private Dish dish; // Le plat associé
+    private Ingredient ingredient; // L'ingrédient associé
+    private Double quantity; // La quantité requise pour ce plat
+    private Unit unit; // L'unité (G, KG, L, etc.)
+
+    public DishIngredient() {
+    }
+
+    // Constructeur utile pour ton DataRetriever
+    public DishIngredient(Ingredient ingredient, Double quantity, Unit unit) {
         this.ingredient = ingredient;
         this.quantity = quantity;
         this.unit = unit;
     }
 
-    public double getLineCost() {
-        return ingredient.getPrice() * quantity;
-    }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    // Getters
+    public Dish getDish() { return dish; }
+    public void setDish(Dish dish) { this.dish = dish; }
+
     public Ingredient getIngredient() { return ingredient; }
-    public double getQuantity() { return quantity; }
+    public void setIngredient(Ingredient ingredient) { this.ingredient = ingredient; }
+
+    public Double getQuantity() { return quantity; }
+    public void setQuantity(Double quantity) { this.quantity = quantity; }
+
     public Unit getUnit() { return unit; }
+    public void setUnit(Unit unit) { this.unit = unit; }
 }

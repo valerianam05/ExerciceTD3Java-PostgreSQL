@@ -10,12 +10,10 @@ public class Ingredient {
     private String name;
     private CategoryEnum category;
     private Double price;
-    private List<StockMovement> stockMovementList = new ArrayList<>();
+    private List<StockMovement> stockMovementList = new ArrayList<>();// tss new
 
     public Ingredient() {
     }
-
-    // CONSTRUCTEUR CORRIGÉ (avec catégorie)
     public Ingredient(Integer id, String name, Double price, CategoryEnum category) {
         this.id = id;
         this.name = name;
@@ -23,11 +21,14 @@ public class Ingredient {
         this.category = category;
     }
 
+    public Ingredient(int id, String name, CategoryEnum category, double price, List<StockMovement> stockMovementsByIngredientId) {
+    }
+
     /**
      * Calcule l'état du stock à un instant précis T
      */
     public StockValue getStockValueAt(Instant t) {
-        double totalQuantity = 0.0;
+        double totalQuantity = 0.0;// le 02 efa marina fa tokony ho hisy an'ity
         Unit defaultUnit = Unit.KG; // Unité par défaut au cas où la liste est vide
 
         for (StockMovement m : this.stockMovementList) {
@@ -53,7 +54,6 @@ public class Ingredient {
         return getStockValueAt(Instant.now()).getQuantity();
     }
 
-    // --- GETTERS ET SETTERS ---
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -67,6 +67,7 @@ public class Ingredient {
     public void setCategory(CategoryEnum category) { this.category = category; }
 
     public List<StockMovement> getStockMovementList() { return stockMovementList; }
+
     public void setStockMovementList(List<StockMovement> mouvements) {
         this.stockMovementList = mouvements;
     }

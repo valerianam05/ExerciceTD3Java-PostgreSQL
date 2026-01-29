@@ -23,3 +23,18 @@ update dish
 set price = 6000.0
 where id = 2;
 
+-- 1. Table pour l'en-tête de la commande
+CREATE TABLE "order" (
+                         id SERIAL PRIMARY KEY,
+                         reference VARCHAR(10) UNIQUE NOT NULL, -- Exemple: ORD00001
+                         creation_datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Table de liaison pour les plats commandés
+CREATE TABLE dish_order (
+                            id SERIAL PRIMARY KEY,
+                            id_order INTEGER REFERENCES "order"(id),
+                            id_dish INTEGER REFERENCES dish(id),
+                            quantity INTEGER NOT NULL
+);
+
