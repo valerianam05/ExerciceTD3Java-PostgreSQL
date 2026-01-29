@@ -8,27 +8,36 @@ public class Order {
     private Integer id;
     private String reference;
     private Instant creationDatetime;
+    private String type;
+    private String status;
+
     private List<DishOrder> dishOrderList = new ArrayList<>();
 
     public Order() {
         this.creationDatetime = Instant.now();
+        this.type = "EAT_IN";
+        this.status = "CREATED";
     }
+
+
 
     public double getTotalAmountWithoutVAT() {
         double total = 0;
-        for (DishOrder item : dishOrderList) {
-            // On multiplie le prix du plat par la quantité
-            if (item.getDish().getPrice() != null) {
-                total += item.getDish().getPrice() * item.getQuantity();
+        if (dishOrderList != null) {
+            for (DishOrder item : dishOrderList) {
+                if (item.getDish() != null && item.getDish().getPrice() != null) {
+                    total += item.getDish().getPrice() * item.getQuantity();
+                }
             }
         }
         return total;
     }
 
     public double getTotalAmountWithVAT() {
-        // Application d'une TVA à 20% par exemple
         return getTotalAmountWithoutVAT() * 1.20;
     }
+
+
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -40,4 +49,20 @@ public class Order {
 
     public List<DishOrder> getDishOrderList() { return dishOrderList; }
     public void setDishOrderList(List<DishOrder> dishOrderList) { this.dishOrderList = dishOrderList; }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

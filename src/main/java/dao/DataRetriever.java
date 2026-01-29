@@ -9,28 +9,76 @@ import java.util.List;
 
 public class DataRetriever {
 
+    public void saveOrder(Order order) {
+        Order existingOrder = findOrderByReference(order.getReference());
 
-    public Order findOrderByReference(String reference) {
+        if (existingOrder != null && "DELIVERED".equals(existingOrder.getStatus())) {
+            throw new RuntimeException("CONFLIT : La commande " + order.getReference() +
+                    " est déjà livrée et ne peut plus être modifiée.");
+        }
+
         DBConnection dbConnection = new DBConnection();
-        try (Connection connection = dbConnection.getConnection()) {
-            PreparedStatement ps = connection.prepareStatement("""
-                    SELECT id, reference, creation_datetime FROM "order" WHERE reference = ?""");
-            ps.setString(1, reference);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                Order order = new Order();
-                Integer idOrder = rs.getInt("id");
-                order.setId(idOrder);
-                order.setReference(rs.getString("reference"));
-                order.setCreationDatetime(rs.getTimestamp("creation_datetime").toInstant());
-                order.setDishOrderList(findDishOrderByIdOrder(idOrder));
-                return order;
+        try (Connection conn = dbConnection.getConnection()) {
+            conn.setAutoCommit(false);
+
+            String sql = """
+            INSERT INTO "order" (reference, creation_datetime, type, status)
+            VALUES (?, ?, ?::order_type, ?::order_status)
+            ON CONFLICT (reference) DO UPDATE 
+            SET type = EXCLUDED.type, 
+                status = EXCLUDED.status;
+        """;
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, order.getReference());
+                ps.setTimestamp(2, java.sql.Timestamp.from(order.getCreationDatetime()));
+                ps.setString(3, order.getType());
+                ps.setString(4, order.getStatus());
+
+                ps.executeUpdate();
+                conn.commit();
+                System.out.println(" Commande " + order.getReference() + " sauvegardée (" + order.getStatus() + ")");
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new RuntimeException("Erreur lors de l'enregistrement : " + e.getMessage());
             }
-            throw new RuntimeException("Order not found with reference " + reference);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Erreur de connexion : " + e.getMessage());
         }
     }
+
+
+    public Order findOrderByReference(String reference) {
+
+        String sql = "SELECT id, reference, creation_datetime, type, status FROM \"order\" WHERE reference = ?";
+        DBConnection dbConnection = new DBConnection();
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, reference);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Order order = new Order();
+                order.setId(rs.getInt("id"));
+                order.setReference(rs.getString("reference"));
+                order.setCreationDatetime(rs.getTimestamp("creation_datetime").toInstant());
+
+                order.setType(rs.getString("type"));
+                order.setStatus(rs.getString("status"));
+
+                return order;
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur findOrderByReference : " + e.getMessage());
+        }
+        return null;
+    }
+
+
+
+
 
     private List<DishOrder> findDishOrderByIdOrder(Integer idOrder) {
         DBConnection dbConnection = new DBConnection();
@@ -49,56 +97,6 @@ public class DataRetriever {
                 dishOrders.add(dishOrder);
             }
             return dishOrders;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void saveOrder(Order order) {
-        // Validation Stock (Logique demandée : Vérifier avant d'enregistrer)
-        for (DishOrder line : order.getDishOrderList()) {
-            for (DishIngredient recipeLine : line.getDish().getDishIngredients()) {
-                Ingredient ing = recipeLine.getIngredient();
-                // Utilise la méthode getStockValueAt du prof dans Ingredient.java
-                StockValue sv = ing.getStockValueAt(Instant.now());
-                double stockActuel = (sv != null) ? sv.getQuantity() : 0.0;
-                double requis = recipeLine.getQuantity() * line.getQuantity();
-
-                if (stockActuel < requis) {
-                    throw new RuntimeException("Stock insuffisant pour " + ing.getName() + " (Requis: " + requis + ")");
-                }
-            }
-        }
-
-        DBConnection dbConnection = new DBConnection();
-        try (Connection conn = dbConnection.getConnection()) {
-            conn.setAutoCommit(false);
-            try {
-                int orderId;
-                try (PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO \"order\" (reference, creation_datetime) VALUES (?, ?) RETURNING id")) {
-                    ps.setString(1, order.getReference());
-                    ps.setTimestamp(2, Timestamp.from(order.getCreationDatetime()));
-                    ResultSet rs = ps.executeQuery();
-                    rs.next();
-                    orderId = rs.getInt(1);
-                }
-
-                try (PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO dish_order (id_order, id_dish, quantity) VALUES (?, ?, ?)")) {
-                    for (DishOrder line : order.getDishOrderList()) {
-                        ps.setInt(1, orderId);
-                        ps.setInt(2, line.getDish().getId());
-                        ps.setInt(3, line.getQuantity());
-                        ps.addBatch();
-                    }
-                    ps.executeBatch();
-                }
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                throw new RuntimeException(e);
-            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

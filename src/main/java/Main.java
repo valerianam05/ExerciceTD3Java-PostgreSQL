@@ -1,12 +1,9 @@
 import dao.DataRetriever;
 import model.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
-    public class Main {
-        public static void main(String[] args) {
-            DataRetriever retriever = new DataRetriever();
+
+public class Main {
 
            // try {
 //                // 1. TEST : Recherche d'ingrédients par critères (Pagination)
@@ -66,27 +63,68 @@ import java.util.List;
 //                System.err.println("❌ Échec de l'ajout de stock : " + e.getMessage());
 //            }
 
+//            try {
+//                Dish platTropCher = retriever.findDishById(1); // Supposons que ce plat utilise l'ingrédient 1
+//
+//                Order cmdImpossible = new Order();
+//                cmdImpossible.setReference("REF-ERROR-" + System.currentTimeMillis());
+//                cmdImpossible.setCreationDatetime(Instant.now());
+//
+//                // On commande 10 000 unités (ça doit dépasser tes 50kg !)
+//                DishOrder ligne = new DishOrder();
+//                ligne.setDish(platTropCher);
+//                ligne.setQuantity(10000);
+//
+//                List<DishOrder> liste = new ArrayList<>();
+//                liste.add(ligne);
+//                cmdImpossible.setDishOrderList(liste);
+//
+//                retriever.saveOrder(cmdImpossible);
+//                System.out.println(" Erreur : La commande a été acceptée alors que le stock est vide !");
+//            } catch (RuntimeException e) {
+//                System.out.println(" Test réussi ! Le système a bien bloqué la commande : " + e.getMessage());
+//            }
+        public static void main(String[] args) {
+            DataRetriever dao = new DataRetriever();
+            String maRef = "TEST-" + System.currentTimeMillis();
+
             try {
-                Dish platTropCher = retriever.findDishById(1); // Supposons que ce plat utilise l'ingrédient 1
+                Order nouvelleCommande = new Order();
+                nouvelleCommande.setReference(maRef);
+                nouvelleCommande.setCreationDatetime(Instant.now());
+                nouvelleCommande.setType("EAT_IN");
+                nouvelleCommande.setStatus("CREATED");
 
-                Order cmdImpossible = new Order();
-                cmdImpossible.setReference("REF-ERROR-" + System.currentTimeMillis());
-                cmdImpossible.setCreationDatetime(Instant.now());
+                System.out.println("\n1. Enregistrement initial...");
+                dao.saveOrder(nouvelleCommande);
 
-                // On commande 10 000 unités (ça doit dépasser tes 50kg !)
-                DishOrder ligne = new DishOrder();
-                ligne.setDish(platTropCher);
-                ligne.setQuantity(10000);
+                System.out.println("\n2. Passage de la commande en READY et TAKE_AWAY...");
+                nouvelleCommande.setStatus("READY");
+                nouvelleCommande.setType("TAKE_AWAY");
+                dao.saveOrder(nouvelleCommande);
 
-                List<DishOrder> liste = new ArrayList<>();
-                liste.add(ligne);
-                cmdImpossible.setDishOrderList(liste);
+                System.out.println("\n3. Passage de la commande en DELIVERED...");
+                nouvelleCommande.setStatus("DELIVERED");
+                dao.saveOrder(nouvelleCommande);
 
-                retriever.saveOrder(cmdImpossible);
-                System.out.println("❌ Erreur : La commande a été acceptée alors que le stock est vide !");
+                System.out.println("\n4. Tentative de modification d'une commande LIVRÉE (Interdit)...");
+                nouvelleCommande.setType("EAT_IN");
+
+                dao.saveOrder(nouvelleCommande);
+
             } catch (RuntimeException e) {
-                System.out.println("✅ Test réussi ! Le système a bien bloqué la commande : " + e.getMessage());
+                System.out.println(" RÉSULTAT ATTENDU : Blocage réussi !");
+                System.out.println("Message d'erreur : " + e.getMessage());
+            } catch (Exception e) {
+                System.err.println(" Erreur inattendue : " + e.getMessage());
+                e.printStackTrace();
             }
-     }
-  }
+
+        }
+
+
+    }
+
+
+
 
