@@ -1,5 +1,7 @@
 package model;
 
 public enum Unit {
-    KG, L, PCS
+    KG,
+    L,
+    PCS
 }

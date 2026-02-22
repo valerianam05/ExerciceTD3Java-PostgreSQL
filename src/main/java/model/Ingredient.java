@@ -10,48 +10,40 @@ public class Ingredient {
     private String name;
     private CategoryEnum category;
     private Double price;
-    private List<StockMovement> stockMovementList = new ArrayList<>();// tss new
+    private Unit unit;
+    private List<StockMovement> stockMovements = new ArrayList<>();
 
     public Ingredient() {
     }
-    public Ingredient(Integer id, String name, Double price, CategoryEnum category) {
+
+    public Ingredient(Integer id, String name, Double price, Unit unit, CategoryEnum category, List<StockMovement> stockMovements) {
         this.id = id;
         this.name = name;
         this.price = price;
+        this.unit = unit;
         this.category = category;
+        this.stockMovements = (stockMovements != null) ? stockMovements : new ArrayList<>();
+
     }
 
-    public Ingredient(int id, String name, CategoryEnum category, double price, List<StockMovement> stockMovementsByIngredientId) {
-    }
-
-    /**
-     * Calcule l'état du stock à un instant précis T
-     */
     public StockValue getStockValueAt(Instant t) {
-        double totalQuantity = 0.0;// le 02 efa marina fa tokony ho hisy an'ity
-        Unit defaultUnit = Unit.KG; // Unité par défaut au cas où la liste est vide
+        double totalQuantity = 0.0;
+        // On utilise l'unité de l'ingrédient définie dans la classe
+        Unit currentUnit = (this.unit != null) ? this.unit : Unit.KG;
 
-        for (StockMovement m : this.stockMovementList) {
-            // Mise à jour de l'unité pour être cohérent avec les mouvements réels
-            defaultUnit = m.getValue().getUnit();
-
-            if (!m.getCreationDatetime().isAfter(t)) {
-                if (m.getType() == MovementType.IN) {
-                    totalQuantity += m.getValue().getQuantity();
-                } else if (m.getType() == MovementType.OUT) {
-                    totalQuantity -= m.getValue().getQuantity();
+        if (this.stockMovements != null) {
+            for (StockMovement m : this.stockMovements) {
+                // On vérifie si le mouvement a eu lieu AVANT ou À l'instant t
+                if (!m.getCreationDatetime().isAfter(t)) {
+                    if (m.getType() == MovementType.IN) {
+                        totalQuantity += m.getValue().getQuantity();
+                    } else if (m.getType() == MovementType.OUT) {
+                        totalQuantity -= m.getValue().getQuantity();
+                    }
                 }
             }
         }
-        return new StockValue(totalQuantity, defaultUnit);
-    }
-
-    /**
-     * Renvoie le stock actuel (à l'instant présent)
-     */
-    public double getCurrentStock() {
-        // On réutilise intelligemment la méthode temporelle
-        return getStockValueAt(Instant.now()).getQuantity();
+        return new StockValue(totalQuantity, currentUnit);
     }
 
     public Integer getId() { return id; }
@@ -66,11 +58,14 @@ public class Ingredient {
     public CategoryEnum getCategory() { return category; }
     public void setCategory(CategoryEnum category) { this.category = category; }
 
-    public List<StockMovement> getStockMovementList() { return stockMovementList; }
+    public Unit getUnit() { return unit; }
+    public void setUnit(Unit unit) { this.unit = unit; }
 
-    public void setStockMovementList(List<StockMovement> mouvements) {
-        this.stockMovementList = mouvements;
+    public List<StockMovement> getStockMovements() { return stockMovements; }
+    public void setStockMovements(List<StockMovement> stockMovements) {
+        this.stockMovements = stockMovements;
     }
+
 
     @Override
     public String toString() {

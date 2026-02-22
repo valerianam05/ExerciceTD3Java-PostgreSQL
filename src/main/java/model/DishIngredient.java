@@ -2,15 +2,14 @@ package model;
 
 public class DishIngredient {
     private Integer id;
-    private Dish dish; // Le plat associé
-    private Ingredient ingredient; // L'ingrédient associé
-    private Double quantity; // La quantité requise pour ce plat
-    private Unit unit; // L'unité (G, KG, L, etc.)
+    private Dish dish;
+    private Ingredient ingredient;
+    private Double quantity;
+    private Unit unit;
 
     public DishIngredient() {
     }
 
-    // Constructeur utile pour ton DataRetriever
     public DishIngredient(Ingredient ingredient, Double quantity, Unit unit) {
         this.ingredient = ingredient;
         this.quantity = quantity;

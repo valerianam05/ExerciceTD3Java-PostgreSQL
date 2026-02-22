@@ -5,15 +5,13 @@ import java.util.Objects;
 
 public class StockMovement {
     private Integer id;
-    private MovementType type; // Correction : Utilisation du nom exact MovementTypeEnum
+    private MovementType type;
     private Instant creationDatetime;
     private StockValue value;
 
-    // 1. Constructeur vide (Indispensable pour le DataRetriever)
     public StockMovement() {
     }
 
-    // 2. Constructeur avec paramètres (Utile pour créer des mouvements manuellement)
     public StockMovement(Integer id, MovementType type, Instant creationDatetime, StockValue value) {
         this.id = id;
         this.type = type;
@@ -21,7 +19,14 @@ public class StockMovement {
         this.value = value;
     }
 
-    // 3. Getters et Setters (Tous doivent être présents pour que JDBC fonctionne)
+    public StockMovement(double quantity, MovementType type, Instant creationDatetime) {
+    }
+    public StockMovement(double quantity, Unit unit, MovementType type, Instant creationDatetime) {
+        this.type = type;
+        this.creationDatetime = creationDatetime;
+        this.value = new StockValue(quantity, unit);
+    }
+
     public Integer getId() {
         return id;
     }
@@ -54,7 +59,6 @@ public class StockMovement {
         this.value = value;
     }
 
-    // 4. Equals et HashCode (Style professeur)
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof StockMovement that)) return false;
@@ -69,7 +73,6 @@ public class StockMovement {
         return Objects.hash(id, type, creationDatetime, value);
     }
 
-    // 5. ToString pour faciliter le débuggage dans la console
     @Override
     public String toString() {
         return "StockMovement{" +

@@ -2,7 +2,7 @@ package model;
 
 public class StockValue {
     private double quantity;
-    private Unit unit; // L'enum que tu as déjà (KG, L, etc.)
+    private Unit unit;
 
     public StockValue(double quantity, Unit unit) {
         this.quantity = quantity;

@@ -1,28 +1,26 @@
 import dao.DataRetriever;
 import model.*;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
 
-import static model.Type_Order.TAKE_AWAY;
+
 
 
 public class Main {
 
-           // try {
-//                // 1. TEST : Recherche d'ingrédients par critères (Pagination)
-//                System.out.println("\n1. Recherche des ingrédients (nom: 'S', page 1, taille 5) :");
+    // try {
 //                List<Ingredient> ingredients = retriever.findIngredientsByCriteria("S", null, 1, 5);
 //                for (Ingredient ing : ingredients) {
 //                    System.out.println(" - " + ing.getName() + " | Prix: " + ing.getPrice() + "€");
 //                }
 //
-//                // 2. TEST : Sauvegarde d'un mouvement de stock (Entrée de stock)
 //                System.out.println("\n2. Ajout d'un mouvement de stock pour l'ingrédient ID 1...");
 //                StockValue val = new StockValue(10.0, Unit.KG);
 //                StockMovement mvt = new StockMovement(0, MovementType.IN, Instant.now(), val);
 //                retriever.saveStockMovement(mvt, 1);
-//                System.out.println("✅ Mouvement enregistré !");
+//                System.out.println(" Mouvement enregistré !");
 //
-//                // 3. TEST : Création d'une commande (Order)
 //                System.out.println("\n3. Tentative de création d'une commande...");
 //
 //                // On récupère un plat existant (ex: ID 1)
@@ -32,7 +30,6 @@ public class Main {
 //                maCommande.setReference("CMD-" + System.currentTimeMillis());
 //                maCommande.setCreationDatetime(Instant.now());
 //
-//                // On commande 2 fois ce plat
 //                DishOrder ligneCommande = new DishOrder();
 //                ligneCommande.setDish(pizza);
 //                ligneCommande.setQuantity(2);
@@ -41,38 +38,34 @@ public class Main {
 //                listeLignes.add(ligneCommande);
 //                maCommande.setDishOrderList(listeLignes);
 //
-//                // Tentative de sauvegarde (vérifie automatiquement le stock)
 //                retriever.saveOrder(maCommande);
-//                System.out.println("✅ Commande enregistrée avec succès !");
+//                System.out.println("Commande enregistrée avec succès !");
 //
 //            } catch (RuntimeException e) {
-//                System.err.println("❌ ERREUR : " + e.getMessage());
+//                System.err.println(" ERREUR : " + e.getMessage());
 //            } catch (Exception e) {
 //                e.printStackTrace();
 //            }
 //
-//            System.out.println("\n--- FIN DU TEST ---");
-            // Dans ton Main.java
+    // Dans ton Main.java
 //            System.out.println("--- TEST 1 : AJOUT DE STOCK ---");
 //            try {
-//                // On crée un mouvement d'entrée (IN) de 50 kg de Tomate (ID ingredient = 1)
 //                StockValue quantite = new StockValue(50.0, Unit.KG);
 //                StockMovement entree = new StockMovement(0, MovementType.IN, Instant.now(), quantite);
 //
 //                retriever.saveStockMovement(entree, 1);
-//                System.out.println("✅ Stock ajouté avec succès pour l'ingrédient 1");
+//                System.out.println(" Stock ajouté avec succès pour l'ingrédient 1");
 //            } catch (Exception e) {
-//                System.err.println("❌ Échec de l'ajout de stock : " + e.getMessage());
+//                System.err.println(" Échec de l'ajout de stock : " + e.getMessage());
 //            }
 
 //            try {
-//                Dish platTropCher = retriever.findDishById(1); // Supposons que ce plat utilise l'ingrédient 1
+//                Dish platTropCher = retriever.findDishById(1);
 //
 //                Order cmdImpossible = new Order();
 //                cmdImpossible.setReference("REF-ERROR-" + System.currentTimeMillis());
 //                cmdImpossible.setCreationDatetime(Instant.now());
 //
-//                // On commande 10 000 unités (ça doit dépasser tes 50kg !)
 //                DishOrder ligne = new DishOrder();
 //                ligne.setDish(platTropCher);
 //                ligne.setQuantity(10000);
@@ -96,7 +89,6 @@ public class Main {
 //                System.out.println("\n1. Enregistrement initial...");
 //                dao.saveOrder(nouvelleCommande);
 //
-//                System.out.println("\n2. Passage de la commande en READY et TAKE_AWAY...");
 //                nouvelleCommande.setStatus("READY");
 //                nouvelleCommande.setType("TAKE_AWAY");
 //                dao.saveOrder(nouvelleCommande);
@@ -117,15 +109,55 @@ public class Main {
 //                e.printStackTrace();
 //            }
 
-    public static void main(String[] args) {
-        DataRetriever data = new DataRetriever();
-        Order order = data.findOrderByReference("ORD100");
-        order.setReference(order.getType());
-        data.saveOrder(order);
+//    public static void main(String[] args) {
+//        DataRetriever data = new DataRetriever();
+//        Order order = data.findOrderByReference("ORD100");
+//        order.setReference(order.getType());
+//        data.saveOrder(order);
+//
+//        }
+//
+//    public static void main(String[] args) {
+//        DataRetriever dr = new DataRetriever();
 
-        }
+//                DataRetriever retriever = new DataRetriever();
+//                int idCible = 2;
+//                Instant maintenant = Instant.now();
+//
+//                StockValue stockSQL = retriever.getStockValueAt(maintenant, idCible);
+//
+//                System.out.println("Approche SQL (Push-down) : " + stockSQL.getQuantity() + " " + stockSQL.getUnit());
+//
+//                Ingredient ingredient = retriever.getIngredientWithMovements(idCible);
+//
+//                if (ingredient != null) {
+//                    StockValue stockJava = ingredient.getStockValueAt(maintenant);
+//                    System.out.println("Approche Objet (Java)    : " + stockJava.getQuantity() + " " + stockJava.getUnit());
+//
+//                    if (stockSQL.getQuantity() == stockJava.getQuantity()) {
+//                        System.out.println(" Les deux approches donnent le même résultat !");
+//                    } else {
+//                        System.out.println("
+//                        Erreur : Les chiffres sont différents.");
+//                    }
+//                }
+//            }
 
-    }
+//
+//        Integer idPlat = 1;
+//
+//
+//        double coutPlat = dr.getDishCost(idPlat);
+//        System.out.println("Coût de revient du plat (ID " + idPlat + ") : " + coutPlat + " Ar");
+//
+//        Double margeBrute = dr.getGrossMargin(idPlat);
+//        System.out.println("Marge brute du plat (ID " + idPlat + ")     : " + margeBrute + " Ar");
+//
+//        System.out.println("Prix de vente estimé (Coût + Marge) : " + (coutPlat + margeBrute) + " Ar");
+
+
+}
+
 
 
 

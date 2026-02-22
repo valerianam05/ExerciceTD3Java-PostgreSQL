@@ -6,7 +6,7 @@ import java.util.List;
 public class Dish {
     private Integer id;
     private String name;
-    private Double price; // Prix de vente (selling_price en DB)
+    private Double price;
     private DishTypeEnum dishType;
     private List<DishIngredient> dishIngredients = new ArrayList<>();
 
@@ -20,10 +20,6 @@ public class Dish {
         this.dishType = dishType;
     }
 
-    /**
-     * CALCUL DU COÛT DE REVIENT (Dish Cost)
-     * Somme de (prix de l'ingrédient * quantité requise)
-     */
     public double getDishCost() {
         double totalCost = 0;
         if (dishIngredients != null) {
@@ -36,10 +32,7 @@ public class Dish {
         return totalCost;
     }
 
-    /**
-     * CALCUL DE LA MARGE BRUTE (Gross Margin)
-     * Prix de vente - Coût de revient
-     */
+
     public double getGrossMargin() {
         if (this.price == null) return 0;
         return this.price - getDishCost();
